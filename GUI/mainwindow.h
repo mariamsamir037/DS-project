@@ -22,6 +22,18 @@ private slots:
 
     void on_Save_btn_clicked();
 
+    void on_actionbrowse_triggered();
+
+    void on_actionSave_as_triggered();
+
+    void on_actionClear_triggered();
+
+    void on_CheckErr_btn_clicked();
+
+    void on_actionFull_Screen_triggered();
+
+    void on_actionExit_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
