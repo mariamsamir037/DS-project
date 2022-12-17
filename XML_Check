@@ -78,10 +78,6 @@ void XML_Check(string xml){
                             }
                             break;
                         }
-                        else
-                        {
-                            continue;
-                        }
                     }
                 }
                 while (!u.empty()) 
