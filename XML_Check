@@ -1,0 +1,36 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <regex>
+#include <stack>
+
+using namespace std;
+
+void XML_Check(string xml){
+    string s;
+    string save;
+    int i =0;
+    string sb;
+    stack<string> d, c, u;
+    bool closing = false;
+    string saveO; 
+    string saveC;
+    while(i<xml.size()){
+        s = xml[i];
+        if(s == "<"){
+            sb = xml[i+1];
+            if(sb!="/"){ 
+               s = xml[i];
+               while(s!=">"){
+                s = xml[i];
+                save += s; 
+                i++;
+               }
+               closing = false; 
+               
+               saveO = save; 
+               
+               saveO.erase(remove(saveO.begin() ,saveO.end(), '<'), saveO.end());
+               saveO.erase(remove(saveO.begin() ,saveO.end(), '>'), saveO.end());
+               d.push(saveO); //push in stack d
+            }
