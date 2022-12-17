@@ -96,7 +96,6 @@ void XML_Check(string xml){
             }
             else
             {
-                cout<<d.top()<<" Tag is true"<<endl;
                 d.pop();
                 c.pop();
             }
