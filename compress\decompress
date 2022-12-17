@@ -1,5 +1,3 @@
-// C++ program to encode and decode a string using
-// Huffman Coding.
 #include <bits/stdc++.h>
 #define MAX_TREE_HT 256
 using namespace std;
@@ -10,12 +8,12 @@ map<char, string> codes;
 map<char, int> freq;
 
 // A Huffman tree node
-struct MinHeapNode {
+struct Node {
     char data; // One of the input characters
     int freq; // Frequency of the character
-    MinHeapNode *left, *right; // Left and right child
+    Node *left, *right; // Left and right child
 
-    MinHeapNode(char data, int freq)
+    Node(char data, int freq)
     {
         left = right = NULL;
         this->data = data;
@@ -25,7 +23,7 @@ struct MinHeapNode {
 
 // utility function for the priority queue
 struct compare {
-    bool operator()(MinHeapNode* l, MinHeapNode* r)
+    bool operator()(Node* l, Node* r)
     {
         return (l->freq > r->freq);
     }
@@ -33,7 +31,7 @@ struct compare {
 
 // utility function to print characters along with
 // there huffman value
-void printCodes(struct MinHeapNode* root, string str)
+void printCodes(struct Node* root, string str)
 {
     if (!root)
         return;
@@ -46,7 +44,7 @@ void printCodes(struct MinHeapNode* root, string str)
 // utility function to store characters along with
 // there huffman value in a hash table, here we
 // have C++ STL map
-void storeCodes(struct MinHeapNode* root, string str)
+void storeCodes(struct Node* root, string str)
 {
     if (root == NULL)
         return;
@@ -58,29 +56,28 @@ void storeCodes(struct MinHeapNode* root, string str)
 
 // STL priority queue to store heap tree, with respect
 // to their heap root node value
-priority_queue<MinHeapNode*, vector<MinHeapNode*>, compare>
-    minHeap;
+priority_queue<Node*, vector<Node*>, compare>
+    pq;
 
 // function to build the Huffman tree and store it
 // in minHeap
 void HuffmanCodes(int size)
 {
-    struct MinHeapNode *left, *right, *top;
+    struct Node *left, *right, *top;
     for (map<char, int>::iterator v = freq.begin();
          v != freq.end(); v++)
-        minHeap.push(new MinHeapNode(v->first, v->second));
-    while (minHeap.size() != 1) {
-        left = minHeap.top();
-        minHeap.pop();
-        right = minHeap.top();
-        minHeap.pop();
-        top = new MinHeapNode('$',
-                              left->freq + right->freq);
+        pq.push(new Node(v->first, v->second));
+    while (pq.size() != 1) {
+        left = pq.top();
+        pq.pop();
+        right = pq.top();
+        pq.pop();
+        top = new Node('$',left->freq + right->freq);
         top->left = left;
         top->right = right;
-        minHeap.push(top);
+        pq.push(top);
     }
-    storeCodes(minHeap.top(), "");
+    storeCodes(pq.top(), "");
 }
 
 // utility function to store map each character with its
@@ -95,10 +92,10 @@ void calcFreq(string str, int n)
 // if s[i]=='1' then move to node->right
 // if s[i]=='0' then move to node->left
 // if leaf node append the node->data to our output string
-string decode_file(struct MinHeapNode* root, string s)
+string decode_file(struct Node* root, string s)
 {
     string ans = "";
-    struct MinHeapNode* curr = root;
+    struct Node* curr = root;
     for (int i = 0; i < s.size(); i++) {
         if (s[i] == '0')
             curr = curr->left;
@@ -114,11 +111,9 @@ string decode_file(struct MinHeapNode* root, string s)
     // cout<<ans<<endl;
     return ans + '\0';
 }
+void comp_decomp( string str)
 
-// Driver code
-int main()
 {
-    string str = "<users><user><id>1</id><name>ANA</name><posts><post><body>Hi</body><topics><topic>economy</topic><topic>finance</topic></topics>";
     string encodedString, decodedString;
     calcFreq(str, str.length());
     HuffmanCodes(str.length());
@@ -134,8 +129,15 @@ int main()
 
       // Function call
     decodedString
-        = decode_file(minHeap.top(), encodedString);
+        = decode_file(pq.top(), encodedString);
     cout << "\nDecoded Huffman Data:\n"
          << decodedString << endl;
+}
+// Driver code
+int main()
+{
+    string str;
+    cin>>str;
+   comp_decomp(str);
     return 0;
 }
