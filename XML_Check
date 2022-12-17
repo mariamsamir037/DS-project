@@ -34,3 +34,87 @@ void XML_Check(string xml){
                saveO.erase(remove(saveO.begin() ,saveO.end(), '>'), saveO.end());
                d.push(saveO); //push in stack d
             }
+            else if(sb =="/"){
+                while(s!=">"){
+                    s = xml[i];
+                    save += s; 
+                    i++;
+                }
+                closing = true;
+                
+                saveC = save;
+                 
+                saveC.erase(remove(saveC.begin() ,saveC.end(), '<'), saveC.end());
+                saveC.erase(remove(saveC.begin() ,saveC.end(), '/'), saveC.end());
+                saveC.erase(remove(saveC.begin() ,saveC.end(), '>'), saveC.end());
+                c.push(saveC); //push in stack c
+            }
+        }
+        else 
+        {
+            while (s != "<")
+            {
+                save += s;
+                i++;
+                s = xml[i];
+            }
+        }
+        if(closing && !d.empty()){ 
+            if(c.top() != d.top()){ 
+                while (!d.empty())
+                {
+                    u.push(d.top()); 
+                    d.pop();
+                    if (!d.empty())
+                    {
+                        if (c.top() == d.top())
+                        {
+                            c.pop();
+                            d.pop();
+                            while (!u.empty())
+                            {
+                                cout<<u.top()<<" tag isn't closed"<<endl;
+                                u.pop();
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+                while (!u.empty()) 
+                {
+                    d.push(u.top());
+                    u.pop();
+                }
+                if (!c.empty()) {
+                    cout<< c.top() << " tag isn't opened" <<endl;
+                    c.pop();
+                }
+            }
+            else
+            {
+                cout<<d.top()<<" Tag is true"<<endl;
+                d.pop();
+                c.pop();
+            }
+            closing = false;
+        
+        }
+        save = "";
+        saveO = "";
+        saveC = "";
+    }
+    while (!d.empty())
+    {
+        cout<<d.top() <<" tag is not closed"<<endl;
+        d.pop();
+    }
+    while (!c.empty())
+    {
+        cout<<c.top() <<" tag is not closed"<<endl;
+        c.pop();
+    }
+}
