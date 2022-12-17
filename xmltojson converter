@@ -4,29 +4,6 @@
 
 using namespace std;
 
-string RemoveSpaces(string xml) {
-    string removed = "";
-    string s, s1;
-    int i = 0;
-
-    while (i < xml.size()) {
-        s = xml[i];
-        s1 = xml[i + 1];
-        if (s == " " && s1 == " ") {
-            i += 2;
-        }
-
-        else if (s == "\r" || s == "\n" || s == "\t") {
-            i++;
-        }
-        else {
-            removed += s;
-            i++;
-        }
-    }
-    return removed;
-}
-
 string xmltoJson(string s)
 {
     string json = "{";
@@ -219,8 +196,7 @@ int main()
    // string xmlfile = "<users><user><id>1 </id ><name>Ahmed Ali< / name><posts><post><body> Mariam</body> <topics><topic>economy< / topic>";
        
     string xmlfile= "<users><user><name>Mar</name><id>1</id><address>24fahmystreet</address></user><user><name>sar</name><id>2</id></user></users>";
-    string no_spaces = RemoveSpaces(xmlfile);
-    string y = xmltoJson(no_spaces);
+    string y = xmltoJson(xmlfile);
     cout << y << endl;
 
     return 0;
