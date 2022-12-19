@@ -19,38 +19,38 @@ void XML_Check(string xml){
         s = xml[i];
         if(s == "<"){
             sb = xml[i+1];
-            if(sb!="/"){ 
+            if(sb!="/"){ //If it is not a closing tag!!
                s = xml[i];
                while(s!=">"){
                 s = xml[i];
-                save += s; 
+                save += s; //save the open tag
                 i++;
                }
                closing = false; 
-               
+               //To save the open tag with tags in saveO
                saveO = save; 
-               
+               //To remove the '<' , '>' to push only inbetween the tags
                saveO.erase(remove(saveO.begin() ,saveO.end(), '<'), saveO.end());
                saveO.erase(remove(saveO.begin() ,saveO.end(), '>'), saveO.end());
                d.push(saveO); //push in stack d
             }
-            else if(sb =="/"){
+            else if(sb =="/"){ //If it is a closing tag!!
                 while(s!=">"){
                     s = xml[i];
-                    save += s; 
+                    save += s; //save the close tag
                     i++;
                 }
                 closing = true;
-                
+                //To save the close tag with tags in saveC
                 saveC = save;
-                 
+                //To remove the '<' , '/', '>'  to push only inbetween the tags
                 saveC.erase(remove(saveC.begin() ,saveC.end(), '<'), saveC.end());
                 saveC.erase(remove(saveC.begin() ,saveC.end(), '/'), saveC.end());
                 saveC.erase(remove(saveC.begin() ,saveC.end(), '>'), saveC.end());
                 c.push(saveC); //push in stack c
             }
         }
-        else 
+        else //if(s != "<")
         {
             while (s != "<")
             {
@@ -59,11 +59,11 @@ void XML_Check(string xml){
                 s = xml[i];
             }
         }
-        if(closing && !d.empty()){ 
-            if(c.top() != d.top()){ 
+        if(closing && !d.empty()){ //if it is a closing tag and the stack d (which store in it the opening tag) is not empty
+            if(c.top() != d.top()){ //if stack c top(closing tag) is not equal stack d top(opening tag)
                 while (!d.empty())
                 {
-                    u.push(d.top()); 
+                    u.push(d.top()); //push the top of stack d in stack u
                     d.pop();
                     if (!d.empty())
                     {
@@ -113,3 +113,10 @@ void XML_Check(string xml){
         c.pop();
     }
 }
+//Test Function
+/* 
+int main(){
+    string s = "<Student>M</name>";
+    XML_Check(s);
+}
+*/
