@@ -109,7 +109,7 @@ void XML_Check(string xml){
     }
     while (!c.empty())
     {
-        cout<<c.top() <<" tag is not closed"<<endl;
+        cout<<c.top() <<" tag is not opened"<<endl;
         c.pop();
     }
 }
