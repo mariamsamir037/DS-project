@@ -2,104 +2,92 @@
 #include <stack>
 #include <string>
 #include<algorithm>
-
+#include "labels.cpp"
 using namespace std;
 
-void correct_XML(string XML){
-    int i = 0;
-    string temp, temp1, temp2, Tag, open_tag_name, closed_tag_name, correct;
-    stack<string> open_st, closed_st, temp_st;
-    while(i < XML.size()){
-        temp1 = XML[i];
-        if(temp1 == "<"){
-            temp2 = XML[i+1];
-            if(temp2 != "/"){
-                temp1 = XML[i];
-                while(temp1 != ">"){
-                    temp1 = XML[i];
-                    Tag += temp1;
-                    i++;
-                }
-                open_tag_name = Tag;
-                open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'<'), open_tag_name.end());
-                open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'>'), open_tag_name.end());
-                open_st.push(open_tag_name);
-                if(!open_st.empty()&& !closed_st.empty()){
-                    if(closed_st.top() == open_st.top()){
-                        correct += Tag;
-                        temp = closed_st.top();
-                        temp.insert(0, "<");
-                        temp.insert(1, "/");
-                        int x = temp.length();
-                        temp.insert(x, ">");
-                        open_st.pop();
-                        closed_st.pop();
-                        correct += temp;
+void correct_XML(vector<string> XML){
+    int bars_repeat = 0;
+    int bars_num = XML.size();
+    string bar;
+    stack<labels> gather;
+
+    while(bars_repeat < bars_num){
+        bar = XML[bars_repeat];
+        int key = 0;
+        while(bar[key] != '\0'){
+            if(bar[key] == '<'){
+                string label;
+                if(bar[key+1] == '/'){
+                    key = key + 2;
+                    while(bar[key -1] != '>'){
+                    label.push_back(bar[key++]);
                     }
-                    else{correct += Tag;}
-                }
-                else{correct += Tag;}
-            }
-            else if(temp2 == "/"){
-                while(temp1 != ">"){
-                    temp1 = XML[i];
-                    Tag += temp1;
-                    i++;
-                }
-                closed_tag_name = Tag;
-                closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'<'), closed_tag_name.end());
-                closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'>'), closed_tag_name.end());
-                closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'/'), closed_tag_name.end());
-                closed_st.push(closed_tag_name);
-                if(!open_st.empty()&& !closed_st.empty()){
-                    if(closed_st.top() != open_st.top()){
-                        while(!closed_st.empty()){
-                            temp_st.push(closed_st.top());
-                            closed_st.pop();
+                CheckLabel:
+                    if(!gather.empty()){
+                        if(label == (gather.top()).features){
+                            gather.pop();
+                        }
+                        else{
+                            bool absentOpenTag = 1;
+                            stack<labels> tempGather = gather;
+                            tempGather.pop();
+                            while(!(tempGather.empty())){
+                                if(label == (tempGather.top()).features){
+                                    labels tempLabel = gather.top();
+                                    gather.pop();
+                                    string tempBar = XML[tempLabel.bar];
+                                    tempLabel.features = "</" + tempLabel.features;
+                                    tempBar.insert(tempLabel.margin, tempLabel.features);
+                                    XML[tempLabel.bar] = tempBar;
+                                    absentOpenTag = 0;
+                                    goto CheckLabel;
+                                }
+                                tempGather.pop();
+                            }
+                            if(absentOpenTag == 1){
+                                labels tempLabel = gather.top();
+                                string tempBar = XML[tempLabel.bar];
+                                label = "<" + label;
+                                tempBar.insert(tempLabel.margin, label);
+                                XML[tempLabel.bar] = tempBar;
+                            }
                         }
                     }
-                    else if(closed_st.top() == open_st.top()){
-                        while(!open_st.empty()&& !closed_st.empty()){
-                            temp = closed_st.top();
-                            temp.insert(0, "<");
-                            temp.insert(1, "/");
-                            int x = temp.length();
-                            temp.insert(x, ">");
-                            closed_st.pop();
-                            open_st.pop();
-                            correct += temp;
-                        }
+                    else{
+                        string tempBar = XML[0];
+                        label = "<" + label;
+                        tempBar.insert(0,label);
+                        XML[0] = tempBar;
                     }
                 }
+                else{
+                    if(bar[key+1] != '?'){
+                        labels *ptr;
+                        key = key + 1;
+                        while(bar[key -1] != '>'){
+                            if(bar[key] == ' '){
+                                label.push_back('>');
+                                break;
+                            }
+                            label.push_back(bar[key++]);
+                        }
+                        ptr = new labels(label, bars_repeat, key);
+                        gather.push(*ptr);
+                    }
+                    else{break;}
+                }
             }
+            else{key++;}
         }
-        else{
-            while(temp1 != "<"){
-                Tag += temp1;
-                i++;
-                temp1 = XML[i];
-            }
-            correct += Tag;
-        }
-        Tag = "";
-        open_tag_name = "";
-        closed_tag_name = "";
-        temp = "";
-        while(!temp_st.empty()){
-            closed_st.push(temp_st.top());
-            temp_st.pop();
-        }
+        bars_repeat++;
     }
-    while(!open_st.empty()&& closed_st.empty()){
-        temp = open_st.top();
-        temp.insert(0, "<");
-        temp.insert(1, "/");
-        int x = temp.length();
-        temp.insert(x, ">");
-        closed_st.push(temp);
-        closed_st.pop();
-        open_st.pop();
-        correct += temp;
+    while(!(gather.empty())){
+        string tempLabel = (gather.top()).features;
+        gather.pop();
+        tempLabel = "</" + tempLabel;
+        XML.push_back(tempLabel);
     }
-    cout << correct << endl;
+    string corrected;
+    corrected = accumulate(begin(XML), end(XML), corrected);
+    cout << corrected << endl;
 }
