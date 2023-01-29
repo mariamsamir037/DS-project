@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
+    <width>875</width>
     <height>675</height>
    </rect>
   </property>
@@ -2891,6 +2891,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="decompress_btn">
+            <property name="text">
+             <string>Decompress</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="Prettify_btn">
             <property name="text">
              <string>Prettify</string>
@@ -2901,14 +2908,14 @@
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QPushButton" name="Graph_btn">
-        <property name="text">
-         <string>Graph View</string>
-        </property>
-       </widget>
-      </item>
      </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="Graph_btn">
+      <property name="text">
+       <string>Graph View</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -2917,7 +2924,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>896</width>
+     <width>875</width>
      <height>22</height>
     </rect>
    </property>
@@ -2934,6 +2941,7 @@
     <addaction name="actionCorrect_Errors"/>
     <addaction name="actionMinify"/>
     <addaction name="actionCompress"/>
+    <addaction name="actionDecompress"/>
     <addaction name="actionPrettify"/>
     <addaction name="actionFull_Screen"/>
     <addaction name="actionExit"/>
@@ -2943,6 +2951,7 @@
      <string>About</string>
     </property>
     <addaction name="actionThis_is_a_GUI_made_by_Jumana_Emad"/>
+    <addaction name="actionThe_functions_are_made_by_Marina_Milad_Monica_Adel_Mariam_Samir_and_Shaimaa_Rashad"/>
    </widget>
    <addaction name="Edit_menu"/>
    <addaction name="menuAbout"/>
@@ -3009,6 +3018,16 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionThe_functions_are_made_by_Marina_Milad_Monica_Adel_Mariam_Samir_and_Shaimaa_Rashad">
+   <property name="text">
+    <string>The functions are made by Marina Milad, Monica Adel, Mariam Samir and Shaimaa Rashad</string>
+   </property>
+  </action>
+  <action name="actionDecompress">
+   <property name="text">
+    <string>Decompress</string>
    </property>
   </action>
  </widget>
