@@ -11,32 +11,31 @@ string xmltoJson(string s)
     string w, word = "";
     //i for xml length, j for json length, x for repeated tags
     int i = 0, j = 1, x = 0;
-    //tag for opening tags but they are poped when they are closed, brackets for({,]) 
+    //tag for opening tags but they are popped when they are closed,   brackets for({,]) 
     stack<string> stack_open_tags, tag, brackets;
     //it's true if opening tag,and false if closing
     stack<bool> opening_tag;
     //bracket holds last printed bracket
     string last_closed_tag, bracket;
-    //saves value of x
+    //saves value of x (repeated tags)
     stack<int> ind;
     while (i < s.size()) {
         w = s[i];
         if (w == "\r" || w == "\n") {
         }
-
         //checking if it's tag or data to be printed
         if (w == "<") {
             i++;
             w = s[i];
-            if (w != "/") { //if opening tag
+            if (w != "/") {     //if opening tag
                 while (w != ">") {
                     word += w;
                     i++;
                     w = s[i];
                 }
-                //if more than one <topic> repeated in scope of <topics>, delete topic from json
+                //if more than one <topic> repeated in scope of <topics>, delete topic from json and add [
                 if (word == last_closed_tag) {
-                    json.erase(x - ((brackets.size() + 1)) - 2, word.length() + 6 + ((brackets.size() + 1))); //6 bec ({ \n " " : ), x->"
+                    json.erase(x - ((brackets.size() + 1)) - 2, word.length() + 6 + ((brackets.size() + 1)));   //6 bec ({ \n " " : ), x->"
                     j -= (word.length() + 6 + ((brackets.size() + 1)));
                     json.insert(x - ((brackets.size() + 1)) - 2, "[\n");
                     j += 2;
@@ -102,7 +101,7 @@ string xmltoJson(string s)
                 i++;
                 opening_tag.push(true);
             }
-            else {  //if closing tag
+            else {      //if closing tag
                 while (w != ">") { //don't print closing tags
                     i++;
                     w = s[i];
@@ -190,7 +189,7 @@ string xmltoJson(string s)
     return json;
 }
 
-/*
+/*  testing the code
 int main()
 {
    // string xmlfile = "<users><user><id>1 </id ><name>Ahmed Ali< / name><posts><post><body> Mariam</body> <topics><topic>economy< / topic>";
