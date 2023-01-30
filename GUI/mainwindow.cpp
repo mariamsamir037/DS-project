@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <bits/stdc++.h>
 #include <QTextCursor>
+#include<algorithm>
 #define MAX_TREE_HT 256
 
 class labels{
@@ -33,127 +34,108 @@ public:
     margin = m;
     }
 };
-void xml_corrector(std::vector<std::string>& xml_file)
-{
-    int bars_repetition = 0;
-    int bars_num = xml_file.size();
+std::vector<std::string> split(std::string str, std::string token){
+    std::vector<std::string>result;
+    while(str.size()){
+        int index = str.find(token);
+        if(index!=std::string::npos){
+            result.push_back(str.substr(0,index));
+            str = str.substr(index+token.size());
+            if(str.size()==0)result.push_back(str);
+        }else{
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
+}
+std::string correct_XML(std::vector<std::string> XML){
+    int bars_repeat = 0;
+    int bars_num = XML.size();
     std::string bar;
-    std::stack<labels> gatherer;
+    std::stack<labels> gather;
 
-    //to check for repeated files
-    while (bars_repetition < bars_num)
-    {
-        bar = xml_file[bars_repetition];
-        int key_repetition = 0;
-        //to check for repeated lines
-        while (bar[key_repetition] != '\0')
-        {
-            if (bar[key_repetition] == '<')
-            {
+    while(bars_repeat < bars_num){
+        bar = XML[bars_repeat];
+        int key = 0;
+        while(bar[key] != '\0'){
+            if(bar[key] == '<'){
                 std::string label;
-                if (bar[key_repetition + 1] == '/')
-                {
-                    key_repetition = key_repetition + 2;
-                    while (bar[key_repetition - 1] != '>')
-                    {
-                        label.push_back(bar[key_repetition++]);
+                if(bar[key+1] == '/'){
+                    key = key + 2;
+                    while(bar[key -1] != '>'){
+                    label.push_back(bar[key++]);
                     }
-                CheckOnlabel:
-                    if (!gatherer.empty())
-                    {
-                        if (label == (gatherer.top()).features)
-                        {
-                            gatherer.pop();
+                CheckLabel:
+                    if(!gather.empty()){
+                        if(label == (gather.top()).features){
+                            gather.pop();
                         }
-                        else
-                        {
+                        else{
                             bool absentOpenTag = 1;
-                            std::stack<labels> temporaryGatherer = gatherer;
-                            temporaryGatherer.pop();
-                            while (!(temporaryGatherer.empty()))
-                            {
-                                //check if the absent tag is a closing one
-                                if (label == ((temporaryGatherer.top()).features))
-                                {
-                                    //corrects the absent closing tag
-                                    labels temporaryLabel = gatherer.top();
-                                    gatherer.pop();
-                                    std::string temporaryBar = xml_file[temporaryLabel.bar];
-                                    temporaryLabel.features = "</" + temporaryLabel.features;
-                                    temporaryBar.insert(temporaryLabel.margin, temporaryLabel.features);
-                                    xml_file[temporaryLabel.bar] = temporaryBar;
-
+                            std::stack<labels> tempGather = gather;
+                            tempGather.pop();
+                            while(!(tempGather.empty())){
+                                if(label == (tempGather.top()).features){
+                                    labels tempLabel = gather.top();
+                                    gather.pop();
+                                    std::string tempBar = XML[tempLabel.bar];
+                                    tempLabel.features = "</" + tempLabel.features;
+                                    tempBar.insert(tempLabel.margin, tempLabel.features);
+                                    XML[tempLabel.bar] = tempBar;
                                     absentOpenTag = 0;
-                                    goto CheckOnlabel;
+                                    goto CheckLabel;
                                 }
-                                temporaryGatherer.pop();
+                                tempGather.pop();
                             }
-                            if (absentOpenTag == 1)
-                            {
-                                //corrects the missing opening tag
-                                labels temporaryLabel = gatherer.top();
-                                std::string temporaryBar = xml_file[temporaryLabel.bar];
+                            if(absentOpenTag == 1){
+                                labels tempLabel = gather.top();
+                                std::string tempBar = XML[tempLabel.bar];
                                 label = "<" + label;
-                                temporaryBar.insert(temporaryLabel.margin, label);
-                                xml_file[temporaryLabel.bar] = temporaryBar;
-
+                                tempBar.insert(tempLabel.margin, label);
+                                XML[tempLabel.bar] = tempBar;
                             }
                         }
                     }
-                    else
-                    {
-                        //while the stack is empty, correct the absent opening tags
-                        std::string temporaryBar = xml_file[0];
+                    else{
+                        std::string tempBar = XML[0];
                         label = "<" + label;
-                        temporaryBar.insert(0, label);
-                        xml_file[0] = temporaryBar;
-
+                        tempBar.insert(0,label);
+                        XML[0] = tempBar;
                     }
                 }
-                else
-                {
-                    if (bar[key_repetition + 1] != '?')
-                    {
-                        //pushes the opening tag onto the stack with its data
+                else{
+                    if(bar[key+1] != '?'){
                         labels *ptr;
-                        key_repetition = key_repetition + 1;
-                        while (bar[key_repetition - 1] != '>')
-                        {
-                            if (bar[key_repetition] == ' ')
-                            {
+                        key = key + 1;
+                        while(bar[key -1] != '>'){
+                            if(bar[key] == ' '){
                                 label.push_back('>');
                                 break;
                             }
-                            label.push_back(bar[key_repetition++]);
+                            label.push_back(bar[key++]);
                         }
-
-                        ptr = new labels(label, bars_repetition, key_repetition);
-                        gatherer.push(*ptr);
+                        ptr = new labels(label, bars_repeat, key);
+                        gather.push(*ptr);
                     }
-                    else
-                    {
-                        break;
-                    }
-
+                    else{break;}
                 }
             }
-            else
-            {
-                key_repetition++;
-            }
+            else{key++;}
         }
-        bars_repetition++;
+        bars_repeat++;
     }
-    //correcting the absent closing tags in the stack
-    while (!(gatherer.empty()))
-    {
-        //correcting the absent closing tags
-        std::string temporaryLabel = (gatherer.top()).features;
-        gatherer.pop();
-        temporaryLabel = "</" + temporaryLabel;
-        xml_file.push_back(temporaryLabel);
+    while(!(gather.empty())){
+        std::string tempLabel = (gather.top()).features;
+        gather.pop();
+        tempLabel = "</" + tempLabel;
+        XML.push_back(tempLabel);
     }
-}
+    std::string corrected;
+    corrected = accumulate(begin(XML), end(XML), corrected);
+    std::cout << corrected << std::endl;
+    return corrected;
+    }
 std::string RemoveSpace(std::string xml) {
    std:: string removed = "";
    std::string s, s1;
@@ -510,7 +492,7 @@ void MainWindow::on_CheckErr_btn_clicked()
     }
     while (!c.empty())
     {
-        ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't closed ");
+        ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
         //QMessageBox::warning(this,"Warning","tag is not closed");
        // cout<<c.top() <<" tag is not closed"<<endl;
         c.pop();
@@ -675,7 +657,7 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
     }
     while (!c.empty())
     {
-        ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't closed ");
+        ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
         c.pop();
     }
 
@@ -687,110 +669,114 @@ void MainWindow::on_Correct_btn_clicked()
     int i = 0;
         std::string temp, temp1, temp2, Tag, open_tag_name, closed_tag_name, correct;
         std::stack<std::string> open_st, closed_st, temp_st;
+        std::vector<std::string> xml;
         QString qstr = ui->input_text->toPlainText();
         std:: string XML=qstr.toStdString();
-        XML = RemoveSpace(XML);
-        //XML.erase(std::remove_if(XML.begin(), XML.end(), ::isspace));
-        //XML.replace(XML.size()-1,2,"");
-       //qDebug()<< QString::fromStdString(XML);
-        while(i < XML.size()){
-            temp1 = XML[i];
-            if(temp1 == "<"){
-                temp2 = XML[i+1];
-                if(temp2 != "/"){
-                    temp1 = XML[i];
-                    while(temp1 != ">"){
-                        temp1 = XML[i];
-                        Tag += temp1;
-                        i++;
-                    }
-                    open_tag_name = Tag;
-                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'<'), open_tag_name.end());
-                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'>'), open_tag_name.end());
-                    open_st.push(open_tag_name);
-                    if(!open_st.empty()&& !closed_st.empty()){
-                        if(closed_st.top() == open_st.top()){
-                            correct += Tag;
-                            temp = closed_st.top();
-                            temp.insert(0, "<");
-                            temp.insert(1, "/");
-                            int x = temp.length();
-                            temp.insert(x, ">");
-                            open_st.pop();
-                            closed_st.pop();
-                            correct += temp;
-                            //qDebug() << QString::fromStdString(correct);
-                        }
-                        else{correct += Tag;}
-                    }
-                    else{correct += Tag;}
-                }
-                else if(temp2 == "/"){
-                    while(temp1 != ">"){
-                        temp1 = XML[i];
-                        Tag += temp1;
-                        i++;
-                    }
-                    closed_tag_name = Tag;
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'<'), closed_tag_name.end());
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'>'), closed_tag_name.end());
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'/'), closed_tag_name.end());
-                    closed_st.push(closed_tag_name);
-                    if(!open_st.empty()&& !closed_st.empty()){
-                        if(closed_st.top() != open_st.top()){
-                            while(!closed_st.empty()){
-                                temp_st.push(closed_st.top());
-                                closed_st.pop();
-                            }
-                        }
-                        else if(closed_st.top() == open_st.top()){
-                            while(!open_st.empty()&& !closed_st.empty()){
-                                temp = closed_st.top();
-                                temp.insert(0, "<");
-                                temp.insert(1, "/");
-                                int x = temp.length();
-                                temp.insert(x, ">");
-                                closed_st.pop();
-                                open_st.pop();
-                                correct += temp;
-                            }
-                        }
-                    }
-                }
-            }
-            else{
-                while(temp1 != "<"){
-                    Tag += temp1;
-                    i++;
-                    temp1 = XML[i];
-                }
-                correct += Tag;
-            }
-            Tag = "";
-            open_tag_name = "";
-            closed_tag_name = "";
-            temp = "";
-            while(!temp_st.empty()){
-                closed_st.push(temp_st.top());
-                temp_st.pop();
-            }
-        }
-        //ana eli mzawedaha de
-        while(!open_st.empty()&& closed_st.empty()){
-            temp = open_st.top();
-            temp.insert(0, "<");
-            temp.insert(1, "/");
-            int x = temp.length();
-            temp.insert(x, ">");
-            closed_st.push(temp);
-            closed_st.pop();
-            open_st.pop();
-            correct += temp;
-        }
-        ui->output_text->insertPlainText(QString::fromStdString(correct));
-        QMessageBox::information(this,"","Corrected");
-       // QMessageBox::warning(this,"Success","Corrected");
-        //cout << correct << endl;
+        //XML = RemoveSpace(XML);
+        xml = split(XML," ");
+        std::string corrected = correct_XML(xml);
+        ui->output_text->insertPlainText(QString::fromStdString(corrected));
+//        //XML.erase(std::remove_if(XML.begin(), XML.end(), ::isspace));
+//        //XML.replace(XML.size()-1,2,"");
+//       //qDebug()<< QString::fromStdString(XML);
+//        while(i < XML.size()){
+//            temp1 = XML[i];
+//            if(temp1 == "<"){
+//                temp2 = XML[i+1];
+//                if(temp2 != "/"){
+//                    temp1 = XML[i];
+//                    while(temp1 != ">"){
+//                        temp1 = XML[i];
+//                        Tag += temp1;
+//                        i++;
+//                    }
+//                    open_tag_name = Tag;
+//                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'<'), open_tag_name.end());
+//                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'>'), open_tag_name.end());
+//                    open_st.push(open_tag_name);
+//                    if(!open_st.empty()&& !closed_st.empty()){
+//                        if(closed_st.top() == open_st.top()){
+//                            correct += Tag;
+//                            temp = closed_st.top();
+//                            temp.insert(0, "<");
+//                            temp.insert(1, "/");
+//                            int x = temp.length();
+//                            temp.insert(x, ">");
+//                            open_st.pop();
+//                            closed_st.pop();
+//                            correct += temp;
+//                            //qDebug() << QString::fromStdString(correct);
+//                        }
+//                        else{correct += Tag;}
+//                    }
+//                    else{correct += Tag;}
+//                }
+//                else if(temp2 == "/"){
+//                    while(temp1 != ">"){
+//                        temp1 = XML[i];
+//                        Tag += temp1;
+//                        i++;
+//                    }
+//                    closed_tag_name = Tag;
+//                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'<'), closed_tag_name.end());
+//                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'>'), closed_tag_name.end());
+//                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'/'), closed_tag_name.end());
+//                    closed_st.push(closed_tag_name);
+//                    if(!open_st.empty()&& !closed_st.empty()){
+//                        if(closed_st.top() != open_st.top()){
+//                            while(!closed_st.empty()){
+//                                temp_st.push(closed_st.top());
+//                                closed_st.pop();
+//                            }
+//                        }
+//                        else if(closed_st.top() == open_st.top()){
+//                            while(!open_st.empty()&& !closed_st.empty()){
+//                                temp = closed_st.top();
+//                                temp.insert(0, "<");
+//                                temp.insert(1, "/");
+//                                int x = temp.length();
+//                                temp.insert(x, ">");
+//                                closed_st.pop();
+//                                open_st.pop();
+//                                correct += temp;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            else{
+//                while(temp1 != "<"){
+//                    Tag += temp1;
+//                    i++;
+//                    temp1 = XML[i];
+//                }
+//                correct += Tag;
+//            }
+//            Tag = "";
+//            open_tag_name = "";
+//            closed_tag_name = "";
+//            temp = "";
+//            while(!temp_st.empty()){
+//                closed_st.push(temp_st.top());
+//                temp_st.pop();
+//            }
+//        }
+//        //ana eli mzawedaha de
+//        while(!open_st.empty()&& closed_st.empty()){
+//            temp = open_st.top();
+//            temp.insert(0, "<");
+//            temp.insert(1, "/");
+//            int x = temp.length();
+//            temp.insert(x, ">");
+//            closed_st.push(temp);
+//            closed_st.pop();
+//            open_st.pop();
+//            correct += temp;
+//        }
+//        ui->output_text->insertPlainText(QString::fromStdString(correct));
+//        QMessageBox::information(this,"","Corrected");
+//       // QMessageBox::warning(this,"Success","Corrected");
+//        //cout << correct << endl;
 }
 void MainWindow::on_actionCorrect_Errors_triggered()
 {
@@ -849,7 +835,7 @@ void MainWindow::on_actionCorrect_Errors_triggered()
                             open_st.pop();
                             closed_st.pop();
                             correct += temp;
-                            qDebug() << QString::fromStdString(correct);
+                            //qDebug() << QString::fromStdString(correct);
                         }
                         else{correct += Tag;}
                     }
