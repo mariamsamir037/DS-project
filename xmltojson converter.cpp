@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stack>
 #include <string>
-
 using namespace std;
 
 string xmltoJson(string s)
@@ -19,7 +18,7 @@ string xmltoJson(string s)
     string last_closed_tag, bracket;
     //saves value of x (repeated tags)
     stack<int> ind;
-    while (i < s.size()) {
+    while (i < s.size()) {  //iterate over the whole xml file
         w = s[i];
         if (w == "\r" || w == "\n") {
         }
