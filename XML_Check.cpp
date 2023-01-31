@@ -1,10 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <regex>
-#include <stack>
-
-using namespace std;
+#include "XML_Check.h"
 
 void XML_Check(string xml){
     string s;
