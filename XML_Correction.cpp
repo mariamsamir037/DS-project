@@ -1,9 +1,3 @@
-#include <iostream>
-#include <stack>
-#include <string>
-#include<algorithm>
-#include "labels.cpp"
-using namespace std;
 
 void correct_XML(vector<string> XML){
     int bars_repeat = 0;
