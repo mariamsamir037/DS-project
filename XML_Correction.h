@@ -4,8 +4,7 @@
 #include <iostream>
 #include <stack>
 #include <string>
-#include<algorithm>
-#include "labels.cpp"
+#include <algorithm>
 
 using namespace std;
 
