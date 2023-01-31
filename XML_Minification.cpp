@@ -1,3 +1,4 @@
+#include "XML_Minification.h"
 
 void minify_XML(string xml) {
     string minifiedString = "", temp1, temp2;
