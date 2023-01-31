@@ -1,8 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-
-using namespace std;
+#include "XML_Prettify.h"
 
 string XML_Prettify(string xml) {
     string s;
