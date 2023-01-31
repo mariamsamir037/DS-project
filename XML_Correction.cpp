@@ -1,4 +1,5 @@
 #include "XML_Correction.h"
+#include "labels.h"
 
 void correct_XML(vector<string> XML){
     int bars_repeat = 0;
