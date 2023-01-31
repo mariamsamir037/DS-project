@@ -1,8 +1,3 @@
-#include <iostream>
-#include <string>
-#include<algorithm>
-
-using namespace std;
 
 void minify_XML(string xml) {
     string minifiedString = "", temp1, temp2;
