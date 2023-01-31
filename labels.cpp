@@ -1,17 +1,7 @@
-#include <iostream>
-#include <string>
-using namespace std;
+#include "labels.h"
 
-class labels{
-public:
-	int bar;
-	int margin;
-	string features;
-
-public:
-	labels(string f, int b, int m){
+labels::labels(string f, int b, int m){
+	features = f;
 	bar = b;
 	margin = m;
-    features = f;
-	}
-};
+}
