@@ -1510,9 +1510,11 @@ void MainWindow::on_actionPrettify_triggered()
                 s = xml[i];
                 sb= xml[i+1];
                 save +=s;
+                  if(i>=xml.size()){break;}
                 i++;
                 }
             for (int j = 0; j < ind; j++) {
+                  if(i>=xml.size()){break;}
                 str += "    ";		//print tab
                 }
              str += save + "\n";
