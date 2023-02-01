@@ -162,6 +162,90 @@ std::string RemoveSpace(std::string xml) {
     }
     return removed;
 }
+std::vector<int> compress(std::string str)
+{
+    std::unordered_map<std::string, int> code_table;
+    for (int i = 0; i <= 255; i++) {
+        std::string single_char = "";
+        single_char += char(i);
+        code_table[single_char] = i;
+    }
+
+    std::string p = "", c = "";
+    p += str[0];
+    int sequ = 256;
+    std::vector<int> out_sequ;
+    for (unsigned int i = 0; i < str.length(); i++) {
+        if (i != str.length() - 1)
+            c += str[i + 1];
+        if (code_table.find(p + c) != code_table.end()) {
+            p = p + c;
+        }
+        else {
+            out_sequ.push_back(code_table[p]);
+            code_table[p + c] = sequ;
+            sequ++;
+            p = c;
+        }
+        c = "";
+    }
+    out_sequ.push_back(code_table[p]);
+    return out_sequ;
+}
+std::string decompress(std::vector<int> o_code)
+{
+    std::string out = "";
+    std::unordered_map<int, std::string> code_table;
+    for (int i = 0; i <= 255; i++) {
+        std::string single_char = "";
+        single_char += char(i);
+        code_table[i] = single_char;
+    }
+    int old_sequ = o_code[0], n;
+    std::string s = code_table[old_sequ];
+    std::string c = "";
+    c += s[0];
+    std::cout << s;
+    int no_seq = 256;
+    for (unsigned int i = 0; i < o_code.size() - 1; i++) {
+        n = o_code[i + 1];
+        if (code_table.find(n) == code_table.end()) {
+            s = code_table[old_sequ];
+            s = s + c;
+        }
+        else {
+            s = code_table[n];
+        }
+        out += s;
+        c = "";
+        c += s[0];
+        code_table[no_seq] = code_table[old_sequ] + c;
+        no_seq++;
+        old_sequ = n;
+    }
+    return out;
+}
+//Function to write the encoded values to .dat file
+void writeFile(std::string f,std::vector<int> a) {
+    std::ofstream file(f, std::ios::binary | std::ios::out);
+    for (unsigned int i = 0; i < a.size(); i++) {
+        int num = a[i];
+        file.write((char *)&num, sizeof(int));
+    }
+    file.close();
+}
+//Function to read the encoded values to .dat file
+std::vector<int> readFile(std::string f) {
+    std::ifstream file(f, std::ios::binary | std::ios::in);
+    std::vector<int>b;
+    while (!file.eof()) {
+        int num;
+        file.read((char *)&num, sizeof(int));
+        b.push_back(num);
+    }
+    file.close();
+    return b;
+}
 // to map each character its huffman value
 std::map<char, std::string> codes;
 // To store the frequency of character of the input data
@@ -311,13 +395,15 @@ void MainWindow::on_Browse_btn_clicked()
     //QFile file("/home/smile/GUI/sample.xml");
     QString extn = ".xml (*.xml)";
     QString file_name = QFileDialog::getOpenFileName(this,"Open a file", QDir::homePath(),extn);
+    //QString file_name = QFileDialog::getOpenFileName(this,"Open a file", QDir::homePath());
     QFile file (file_name);
     if(!file.open(QFile::ReadOnly|QFile::Text)){
         QMessageBox::warning(this,"Warning","file not open");
     }
-    QTextStream in(&file);
-    QString text = in.readAll();
-    ui->input_text->setPlainText(text);
+        QTextStream in(&file);
+        QString text = in.readAll();
+        ui->input_text->setPlainText(text);
+ 
     file.close();
 }
 void MainWindow::on_actionbrowse_triggered()
@@ -1427,9 +1513,11 @@ void MainWindow::on_Prettify_btn_clicked()
                 s = xml[i];
                 sb= xml[i+1];
                 save +=s;
+                if (i >= xml.size()){break;}
                 i++;
                 }
             for (int j = 0; j < ind; j++) {
+                if(i>=xml.size()){break;}
                 str += "    ";		//print tab
                 }
              str += save + "\n";
@@ -1441,7 +1529,6 @@ void MainWindow::on_Prettify_btn_clicked()
 
 void MainWindow::on_Graph_btn_clicked()
 {
-
 }
 
 
@@ -1510,11 +1597,9 @@ void MainWindow::on_actionPrettify_triggered()
                 s = xml[i];
                 sb= xml[i+1];
                 save +=s;
-                  if(i>=xml.size()){break;}
                 i++;
                 }
             for (int j = 0; j < ind; j++) {
-                  if(i>=xml.size()){break;}
                 str += "    ";		//print tab
                 }
              str += save + "\n";
