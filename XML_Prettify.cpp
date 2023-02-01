@@ -18,15 +18,15 @@ string XML_Prettify(string xml) {
                 s = xml[i];
                 save +=s;
                 i++;
-                }
+            }
             open++;
             close = 0;
             if (open > 1) {
                 ind++;
-                }
+            }
             for (int j = 0; j < ind; j++) {
                 str += "\t";		//print tab
-                }
+            }
             str += save + "\n";	//print output
         }
         else if(s == "<" && sb == "/"){ //If it is a closing tag!!
@@ -35,7 +35,7 @@ string XML_Prettify(string xml) {
                 s = xml[i];
                 save +=s;
                 i++;
-                }
+            }
             close++;
             open = 0;
             if (close > 1) {
@@ -53,11 +53,17 @@ string XML_Prettify(string xml) {
                 s = xml[i];
                 sb= xml[i+1];
                 save +=s;
+                if(i>= xml.size()){
+                    break;
+                }
                 i++;
-                }
+            }
             for (int j = 0; j < ind; j++) {
-                str += "\t";		//print tab
+                if(i>= xml.size()){
+                    break;
                 }
+                str += "\t";		//print tab
+             }
              str += save + "\n";
         }
     }
