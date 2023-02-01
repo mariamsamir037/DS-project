@@ -1,3 +1,5 @@
+// C++ program to encode and decode a string using
+// Huffman Coding.
 #include <bits/stdc++.h>
 #define MAX_TREE_HT 256
 using namespace std;
@@ -8,12 +10,12 @@ map<char, string> codes;
 map<char, int> freq;
 
 // A Huffman tree node
-struct Node {
+struct MinHeapNode {
     char data; // One of the input characters
     int freq; // Frequency of the character
-    Node *left, *right; // Left and right child
+    MinHeapNode *left, *right; // Left and right child
 
-    Node(char data, int freq)
+    MinHeapNode(char data, int freq)
     {
         left = right = NULL;
         this->data = data;
@@ -23,7 +25,7 @@ struct Node {
 
 // utility function for the priority queue
 struct compare {
-    bool operator()(Node* l, Node* r)
+    bool operator()(MinHeapNode* l, MinHeapNode* r)
     {
         return (l->freq > r->freq);
     }
@@ -31,7 +33,7 @@ struct compare {
 
 // utility function to print characters along with
 // there huffman value
-void printCodes(struct Node* root, string str)
+void printCodes(struct MinHeapNode* root, string str)
 {
     if (!root)
         return;
@@ -44,7 +46,7 @@ void printCodes(struct Node* root, string str)
 // utility function to store characters along with
 // there huffman value in a hash table, here we
 // have C++ STL map
-void storeCodes(struct Node* root, string str)
+void storeCodes(struct MinHeapNode* root, string str)
 {
     if (root == NULL)
         return;
@@ -56,28 +58,29 @@ void storeCodes(struct Node* root, string str)
 
 // STL priority queue to store heap tree, with respect
 // to their heap root node value
-priority_queue<Node*, vector<Node*>, compare>
-    pq;
+priority_queue<MinHeapNode*, vector<MinHeapNode*>, compare>
+    minHeap;
 
 // function to build the Huffman tree and store it
 // in minHeap
 void HuffmanCodes(int size)
 {
-    struct Node *left, *right, *top;
+    struct MinHeapNode *left, *right, *top;
     for (map<char, int>::iterator v = freq.begin();
          v != freq.end(); v++)
-        pq.push(new Node(v->first, v->second));
-    while (pq.size() != 1) {
-        left = pq.top();
-        pq.pop();
-        right = pq.top();
-        pq.pop();
-        top = new Node('$',left->freq + right->freq);
+        minHeap.push(new MinHeapNode(v->first, v->second));
+    while (minHeap.size() != 1) {
+        left = minHeap.top();
+        minHeap.pop();
+        right = minHeap.top();
+        minHeap.pop();
+        top = new MinHeapNode('$',
+                              left->freq + right->freq);
         top->left = left;
         top->right = right;
-        pq.push(top);
+        minHeap.push(top);
     }
-    storeCodes(pq.top(), "");
+    storeCodes(minHeap.top(), "");
 }
 
 // utility function to store map each character with its
@@ -92,10 +95,10 @@ void calcFreq(string str, int n)
 // if s[i]=='1' then move to node->right
 // if s[i]=='0' then move to node->left
 // if leaf node append the node->data to our output string
-string decode_file(struct Node* root, string s)
+string decode_file(struct MinHeapNode* root, string s)
 {
     string ans = "";
-    struct Node* curr = root;
+    struct MinHeapNode* curr = root;
     for (int i = 0; i < s.size(); i++) {
         if (s[i] == '0')
             curr = curr->left;
@@ -111,9 +114,11 @@ string decode_file(struct Node* root, string s)
     // cout<<ans<<endl;
     return ans + '\0';
 }
-void comp_decomp( string str)
 
+// Driver code
+int main()
 {
+    string str = "<users><user><id>1</id><name>ANA</name><posts><post><body>Hi</body><topics><topic>economy</topic><topic>finance</topic></topics>";
     string encodedString, decodedString;
     calcFreq(str, str.length());
     HuffmanCodes(str.length());
@@ -128,7 +133,9 @@ void comp_decomp( string str)
          << encodedString << endl;
 
       // Function call
-    decodedString = decode_file(pq.top(), encodedString);
+    decodedString
+        = decode_file(minHeap.top(), encodedString);
     cout << "\nDecoded Huffman Data:\n"
          << decodedString << endl;
+    return 0;
 }
