@@ -55,6 +55,18 @@ private slots:
 
     void on_actionPrettify_triggered();
 
+    void on_actionMost_Followed_triggered();
+
+    void on_actionMost_Active_triggered();
+
+    void on_actionMutual_Friends_triggered();
+
+    void on_actionSuggest_Friends_triggered();
+
+    void on_actionPost_Search_triggered();
+
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

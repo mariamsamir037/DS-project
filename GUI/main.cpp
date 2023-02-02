@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     w.show();
     w.setWindowTitle("XML Editor");
     w.resize(920,635);
+
     return a.exec();
 
 }
