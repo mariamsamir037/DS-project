@@ -1,35 +1,11 @@
 // C++ program to encode and decode a string using
 // Huffman Coding.
-#include <bits/stdc++.h>
-#define MAX_TREE_HT 256
-using namespace std;
+#include "compress_decompress.h"
 
 // to map each character its huffman value
 map<char, string> codes;
 // To store the frequency of character of the input data
 map<char, int> freq;
-
-// A Huffman tree node
-struct MinHeapNode {
-    char data; // One of the input characters
-    int freq; // Frequency of the character
-    MinHeapNode *left, *right; // Left and right child
-
-    MinHeapNode(char data, int freq)
-    {
-        left = right = NULL;
-        this->data = data;
-        this->freq = freq;
-    }
-};
-
-// utility function for the priority queue
-struct compare {
-    bool operator()(MinHeapNode* l, MinHeapNode* r)
-    {
-        return (l->freq > r->freq);
-    }
-};
 
 // utility function to print characters along with
 // there huffman value

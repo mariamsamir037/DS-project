@@ -1,7 +1,4 @@
-#include <iostream>
-#include <stack>
-#include <string>
-using namespace std;
+#include "xmltoJson_Converter.h"
 
 string xmltoJson(string s)
 {
