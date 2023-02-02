@@ -43,3 +43,53 @@ It is a way to reduce the
 size of the file using a data compression technique.
 The smaller the output file is, the more efficient your algorithm is.
 Decompressing the compressed data makes it return to its original format.
+
+<h3> 7. Representing the users' data: </h3>
+
+the XML file will represent the
+users data in a social network (their posts, followers, ...etc). 
+The user data is his id (unique across the network), name, list of his posts and followers.
+
+<h3> 8. Network Analysis: </h3>
+
+We use this analysis to extract important data like:
+* who is the most influencer user (has the most followers)
+* who is the most active user (connected to lots of users)
+* the mutual followers between 2 users
+* for each user, suggest a list of users to follow (the followers of his followers)
+
+<h3> 9. Post Search: </h3>
+
+given a specific word or topic, we can get the posts where this word or topic was
+mentioned.
+
+<h2> How to use the executable file: </h2>
+
+    1. Click on the "Clear" button to clear input and output.
+    2. Click on the "Browse" button to open an existing XML file.
+    3. Click on the "Save As" button to save changes in a new file.
+    4. Click on the "Exit" button to exit the application.
+    5. Click on the "Convert to JSON" button to convert the XML file to JSON.
+    6. Click on the "Check for Errors" button to check and detect if there are any errors in the XML file.
+    7. Click on the "Correct Errors" button to correct the errors in the XML file.
+    8. Click on the "Minify" button to minify the XML file.
+    9. Click on the "Compress" button to compress the XML file.
+    10. Click on the "Decompress" button to decompress the XML file.
+    11. Click on the "Prettify" button to prettify the XML file and show it in its correct format.
+    12. Click on the "Post Search" button to search the XML file for a specefic word or topic.
+    13. Click on the "Most Followed" button to show user that has largest number of followers.
+    14. Click on the "Most Active" button to show user with highest number of posts and that with most following.
+    15. Click on the "Mutual Friends" button to show mutual followers between 2 users.
+    16. Click on the "Recommend Friends" button to suggest users to follow.
+
+<h2> Check Drive Link for Full Report, EXE file and Short Illustration Video: </h2>
+
+https://drive.google.com/drive/folders/1o4jGBEchZmsRkhPnkxBG7jtTdDU_Un-L
+
+<h2> Contributors: </h2>
+
+The following individuals have contributed to this project:
+
+<a href="https://github.com/mariamsamir037/DS-project/graphs/contributors">   
+  <img src="https://contrib.rocks/image?repo=mariamsamir037/DS-project" />
+</a>
