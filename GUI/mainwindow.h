@@ -20,6 +20,7 @@ private slots:
 
     void on_actionFull_Screen_triggered();
     void on_actionExit_triggered();
+    void on_Exit_Button_clicked();
 
     void on_Browse_btn_clicked();
     void on_actionbrowse_triggered();
@@ -45,27 +46,24 @@ private slots:
     void on_decompress_btn_clicked();
     void on_actionDecompress_triggered();
 
-
-
-
-
-    void on_Graph_btn_clicked();
-
     void on_Prettify_btn_clicked();
-
     void on_actionPrettify_triggered();
 
+    void on_Most_followed_clicked();
     void on_actionMost_Followed_triggered();
 
+    void on_Most_Active_clicked();
     void on_actionMost_Active_triggered();
 
+    void on_Mutual_friends_clicked();
     void on_actionMutual_Friends_triggered();
 
+    void on_Recommend_friends_clicked();
     void on_actionSuggest_Friends_triggered();
 
+    void on_Search_btn_clicked();
     void on_actionPost_Search_triggered();
 
-    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

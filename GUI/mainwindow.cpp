@@ -396,6 +396,7 @@ std::string XmlParser::HexToBi(XmlParser::myPair<int,string> encoded){
 bool XmlParser::compareByLength(const myPair<string, string>& a, const myPair<string, string>& b) {
     return a.second.size() < b.second.size();
 }
+
 bool XmlParser::isSubString(string target, string base)
 {
     int targetIndex = 0;
@@ -438,6 +439,7 @@ int XmlParser::isItemFound(int item, vector<int>& itemVec)
     }
     return -1;
 }
+
 bool XmlParser::compareUsers(User user1, User user2)
 {
     return stoi(user1.id.second) <= stoi(user2.id.second);
@@ -463,6 +465,7 @@ string XmlParser::searchPosts(string keyWord)
         postList = "NO POSTS FOUND :(";
     return postList;
 }
+
 string XmlParser::getMutualFollowers(string ID1, string ID2)
 {
     if (!isNumber(ID1) && !isNumber(ID2))
@@ -529,6 +532,7 @@ string XmlParser::recommendPeople(string id)
             toFollow.append(to_string(toFollowIds[i]) + " ");
     return toFollow.empty() ? "No recommendations found :(" : "The list of recommended to follow: \n" + toFollow;
 }
+
 string XmlParser::doNetworkAnalysis()
 {
     string influencerString;
@@ -574,6 +578,7 @@ string XmlParser::MostActive()
     Following_string = (Following == -1) ? "NO ONE IS FOLLOWING ANYONE" : "The List of most following people with " + to_string(Following) + " following/s :\n" + Following_string;
     return  writerString + "____\n" + Following_string ;
 }
+
 void XmlParser::extractData() {
     users.clear();
     vector<Post> posts;
@@ -771,6 +776,7 @@ void XmlParser::fillColors() {
         }
     }
 }
+
 string XmlParser::getTagFrame(string& xml, int& pointer) {
     string tagFrame;
     tagFrame.push_back('<');
@@ -780,15 +786,6 @@ string XmlParser::getTagFrame(string& xml, int& pointer) {
     tagFrame.push_back('>');
     return tagFrame;
 }
-string XmlParser::trimLine(string input) {
-    for (int i = 0; i < input.size() && input[i] == ' ';)
-        input.erase(i, 1);
-    for (int i = input.size() - 1; i >= 0 && input[i] == ' '; --i)
-    {
-        input.erase(i, 1);
-    }
-    return input;
-}
 string XmlParser::getData(string& xml, int& counter) {
     string data;
     while (!(xml[counter] == '<' && (counter == 0 || xml[counter - 1] != '\\' || (counter >= 2 && xml[counter - 1] == '\\' && xml[counter - 2] == '\\')))
@@ -797,6 +794,16 @@ string XmlParser::getData(string& xml, int& counter) {
         ++counter;
     }
     return data;
+}
+
+string XmlParser::trimLine(string input) {
+    for (int i = 0; i < input.size() && input[i] == ' ';)
+        input.erase(i, 1);
+    for (int i = input.size() - 1; i >= 0 && input[i] == ' '; --i)
+    {
+        input.erase(i, 1);
+    }
+    return input;
 }
 
 template<class T>
@@ -851,6 +858,7 @@ void XmlParser::Follower::setFollower() {
         }
     }
 }
+
 template<class T, class U>
 void XmlParser::myPair<T, U>::setPairValues(T first, U second)
 {
@@ -866,6 +874,7 @@ XmlParser::myPair<T, U>::myPair(T first, U second)
 template<class T, class U>
 XmlParser::myPair<T, U>::myPair()
 {}
+
 void XmlParser::Post::clear()
 {
     postOrder.clear();
@@ -882,6 +891,7 @@ void XmlParser::Post::setPost() {
     //setting the topics
     setField(topics, topicsVector);
 }
+
 void XmlParser::User::clear()
 {
     userOrder.clear();
@@ -908,6 +918,7 @@ void XmlParser::User::setUser()
     setField(posts, postsVector);
     setField(followers, followersVector);
 }
+
 bool XmlParser::isStartTag(string tag) {
     if (tag[1] != '/' && tag[0] == '<')
         return true;
@@ -930,6 +941,7 @@ public:
     margin = m;
     }
 };
+
 std::vector<std::string> split(std::string str, std::string token){
     std::vector<std::string>result;
     while(str.size()){
@@ -1032,6 +1044,7 @@ std::string correct_XML(std::vector<std::string> XML){
     std::cout << corrected << std::endl;
     return corrected;
     }
+
 std::string RemoveSpace(std::string xml) {
    std:: string removed = "";
    std::string s, s1;
@@ -1088,6 +1101,94 @@ std::vector<int> compress(std::string str)
     out_sequ.push_back(code_table[p]);
     return out_sequ;
 }
+
+std::map<char, std::string> codes;
+std::map<char, int> freq;
+
+struct MinHeapNode {
+    char data; // One of the input characters
+    int freq; // Frequency of the character
+    MinHeapNode *left, *right; // Left and right child
+
+    MinHeapNode(char data, int freq)
+    {
+        left = right = NULL;
+        this->data = data;
+        this->freq = freq;
+    }
+};
+struct compare {
+    bool operator()(MinHeapNode* l, MinHeapNode* r)
+    {
+        return (l->freq > r->freq);
+    }
+};
+
+void storeCodes(struct MinHeapNode* root, std::string str)
+{
+    if (root == NULL)
+        return;
+    if (root->data != '$')
+        codes[root->data] = str;
+    storeCodes(root->left, str + "0");
+    storeCodes(root->right, str + "1");
+}
+void printCodes(struct MinHeapNode* root, std::string str)
+{
+    if (!root)
+        return;
+    //if (root->data != '$')
+       // std::cout <<root->data << ": " << str << "\n";
+    printCodes(root->left, str + "0");
+    printCodes(root->right, str + "1");
+}
+
+std::priority_queue<MinHeapNode*, std::vector<MinHeapNode*>, compare>minHeap;
+
+void HuffmanCodes(int size)
+{
+    struct MinHeapNode *left, *right, *top;
+    for (std::map<char, int>::iterator v = freq.begin();
+         v != freq.end(); v++)
+        minHeap.push(new MinHeapNode(v->first, v->second));
+    while (minHeap.size() != 1) {
+        left = minHeap.top();
+        minHeap.pop();
+        right = minHeap.top();
+        minHeap.pop();
+        top = new MinHeapNode('$',
+                              left->freq + right->freq);
+        top->left = left;
+        top->right = right;
+        minHeap.push(top);
+    }
+    storeCodes(minHeap.top(), "");
+}
+void calcFreq(std::string str, int n)
+{
+    for (int i = 0; i < str.size(); i++)
+        freq[str[i]]++;
+}
+
+std::string decode_file(struct MinHeapNode* root, std::string s)
+{
+    std::string ans = "";
+    struct MinHeapNode* curr = root;
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i] == '0')
+            curr = curr->left;
+        else
+            curr = curr->right;
+
+        // reached leaf node
+        if (curr->left == NULL and curr->right == NULL) {
+            ans += curr->data;
+            curr = root;
+        }
+    }
+    // cout<<ans<<endl;
+    return ans + '\0';
+}
 std::string decompress(std::vector<int> o_code)
 {
     std::string out = "";
@@ -1121,127 +1222,7 @@ std::string decompress(std::vector<int> o_code)
     }
     return out;
 }
-//Function to write the encoded values to .dat file
-void writeFile(std::string f,std::vector<int> a) {
-    std::ofstream file(f, std::ios::binary | std::ios::out);
-    for (unsigned int i = 0; i < a.size(); i++) {
-        int num = a[i];
-        file.write((char *)&num, sizeof(int));
-    }
-    file.close();
-}
-//Function to read the encoded values to .dat file
-std::vector<int> readFile(std::string f) {
-    std::ifstream file(f, std::ios::binary | std::ios::in);
-    std::vector<int>b;
-    while (!file.eof()) {
-        int num;
-        file.read((char *)&num, sizeof(int));
-        b.push_back(num);
-    }
-    file.close();
-    return b;
-}
-// to map each character its huffman value
-std::map<char, std::string> codes;
-// To store the frequency of character of the input data
-std::map<char, int> freq;
-struct MinHeapNode {
-    char data; // One of the input characters
-    int freq; // Frequency of the character
-    MinHeapNode *left, *right; // Left and right child
 
-    MinHeapNode(char data, int freq)
-    {
-        left = right = NULL;
-        this->data = data;
-        this->freq = freq;
-    }
-};
-// utility function for the priority queue
-struct compare {
-    bool operator()(MinHeapNode* l, MinHeapNode* r)
-    {
-        return (l->freq > r->freq);
-    }
-};
-// utility function to print characters along with
-// there huffman value
-// utility function to store characters along with
-// there huffman value in a hash table, here we
-// have C++ STL map
-void storeCodes(struct MinHeapNode* root, std::string str)
-{
-    if (root == NULL)
-        return;
-    if (root->data != '$')
-        codes[root->data] = str;
-    storeCodes(root->left, str + "0");
-    storeCodes(root->right, str + "1");
-}
-
-// STL priority queue to store heap tree, with respect
-// to their heap root node value
-std::priority_queue<MinHeapNode*, std::vector<MinHeapNode*>, compare>
-    minHeap;
-
-// function to build the Huffman tree and store it
-// in minHeap
-void HuffmanCodes(int size)
-{
-    struct MinHeapNode *left, *right, *top;
-    for (std::map<char, int>::iterator v = freq.begin();
-         v != freq.end(); v++)
-        minHeap.push(new MinHeapNode(v->first, v->second));
-    while (minHeap.size() != 1) {
-        left = minHeap.top();
-        minHeap.pop();
-        right = minHeap.top();
-        minHeap.pop();
-        top = new MinHeapNode('$',
-                              left->freq + right->freq);
-        top->left = left;
-        top->right = right;
-        minHeap.push(top);
-    }
-    storeCodes(minHeap.top(), "");
-}
-
-// utility function to store map each character with its
-// frequency in input string
-void calcFreq(std::string str, int n)
-{
-    for (int i = 0; i < str.size(); i++)
-        freq[str[i]]++;
-}
-void printCodes(struct MinHeapNode* root, std::string str)
-{
-    if (!root)
-        return;
-    //if (root->data != '$')
-       // std::cout <<root->data << ": " << str << "\n";
-    printCodes(root->left, str + "0");
-    printCodes(root->right, str + "1");
-}
-std::string decode_file(struct MinHeapNode* root, std::string s)
-{
-    std::string ans = "";
-    struct MinHeapNode* curr = root;
-    for (int i = 0; i < s.size(); i++) {
-        if (s[i] == '0')
-            curr = curr->left;
-        else
-            curr = curr->right;
-
-        // reached leaf node
-        if (curr->left == NULL and curr->right == NULL) {
-            ans += curr->data;
-            curr = root;
-        }
-    }
-    // cout<<ans<<endl;
-    return ans + '\0';
-}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -1284,7 +1265,7 @@ void MainWindow::on_actionExit_triggered()
 {
    close();
 }
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_Exit_Button_clicked()
 {
     close();
 }
@@ -1292,10 +1273,8 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_Browse_btn_clicked()
 {
     ui->output_text->clear();
-    //QFile file("/home/smile/GUI/sample.xml");
     QString extn = ".xml (*.xml)";
     QString file_name = QFileDialog::getOpenFileName(this,"Open a file", QDir::homePath(),extn);
-    //QString file_name = QFileDialog::getOpenFileName(this,"Open a file", QDir::homePath());
     QFile file (file_name);
     if(!file.open(QFile::ReadOnly|QFile::Text)){
         QMessageBox::warning(this,"Warning","file not open");
@@ -1308,21 +1287,22 @@ void MainWindow::on_Browse_btn_clicked()
 }
 void MainWindow::on_actionbrowse_triggered()
 {
+    ui->output_text->clear();
     QString extn = ".xml (*.xml)";
     QString file_name = QFileDialog::getOpenFileName(this,"Open a file", QDir::homePath(),extn);
     QFile file (file_name);
     if(!file.open(QFile::ReadOnly|QFile::Text)){
         QMessageBox::warning(this,"Warning","file not open");
     }
-    QTextStream in(&file);
-    QString text = in.readAll();
-    ui->input_text->setPlainText(text);
+        QTextStream in(&file);
+        QString text = in.readAll();
+        ui->input_text->setPlainText(text);
+
     file.close();
 }
 
 void MainWindow::on_Save_btn_clicked()
 {
-     //ui->input_text->insertPlainText("hello ");
     QString file_name = QFileDialog::getSaveFileName(this,"Save As", QDir::homePath());
     QFile file(file_name);
     if(!file.open(QFile::WriteOnly|QFile::Text)){
@@ -1350,7 +1330,11 @@ void MainWindow::on_actionSave_as_triggered()
     }
     else{
     QTextStream out(&file);
-    QString text = ui->input_text->toPlainText();
+    QString text;
+    if (ui->output_text->toPlainText() == ""){
+    text = ui->input_text->toPlainText();}
+    else{
+    text = ui->output_text->toPlainText();}
     out<<text;
     file.flush();
     file.close();
@@ -1429,9 +1413,7 @@ void MainWindow::on_CheckErr_btn_clicked()
                             while (!u.empty())
                             {
 
-                                //msgBox.setText("Message Box " +QString::fromStdString(" tag isn't closed" +(u.top())));
-                                //cout<<u.top()<<" tag isn't closed"<<endl;
-                                 ui -> output_text->append((QString::fromStdString(u.top())) + " tag isn't closed ");
+                                ui -> output_text->append((QString::fromStdString(u.top())) + " tag isn't closed ");
                                 u.pop();
                             }
                             break;
@@ -1448,17 +1430,12 @@ void MainWindow::on_CheckErr_btn_clicked()
                     u.pop();
                 }
                 if (!c.empty()) {
-                   //std::cout<< c.top() << " tag isn't opened" <<endl;
-                   ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
-                   //QMessageBox::warning(this,"Warning","tag isn't opened");
+                    ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
                     c.pop();
                 }
             }
             else
             {
-                //msgBox.setText("Message Box " +QString::fromStdString(" tag is true"));
-                //ui -> output_text->append((QString::fromStdString(d.top())) + " tag is true ");
-                //cout<<d.top()<<" Tag is true"<<endl;
                 d.pop();
                 c.pop();
             }
@@ -1472,15 +1449,11 @@ void MainWindow::on_CheckErr_btn_clicked()
     while (!d.empty())
     {
         ui -> output_text->append((QString::fromStdString(d.top())) + " tag isn't closed ");
-        //QMessageBox::warning(this,"Warning",QString(("tag isn't closed")));
-        //cout<<d.top() <<" tag is not closed"<<endl;
         d.pop();
     }
     while (!c.empty())
     {
         ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
-        //QMessageBox::warning(this,"Warning","tag is not closed");
-       // cout<<c.top() <<" tag is not closed"<<endl;
         c.pop();
     }
 }
@@ -1495,9 +1468,7 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
     std::string save;
     QMessageBox msgBox;
     int i =0;
-    std::string sb,next;
-//    std::string open_tag_name;
-//    std::string close_tag_name;
+    std::string sb;
     std::stack<std::string> d, c, u;
     bool closing = false;
     std::string saveO;
@@ -1508,70 +1479,24 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
             sb = xml[i+1];
             if(sb!="/"){
                s = xml[i];
-               //zawedt hena
                while(s!=">"){
-                //w hena
                 s = xml[i];
-                next = xml[i+1];
-//                if (s ==" "){
-//                    save +=">";
-//                    ui -> output_text->append((QString::fromStdString(save)) + " tag is missing the second tag");
-//                    break;
-//                }
-//                else
-                    if ( next == "<" ||next ==" "){
-                    save += s;
-                    break;
-
-                }
-                else{
-
                 save += s;
                 i++;
-                }
-
                }
                closing = false;
-               next = xml[i+1];
-               if ((next =="<"|| next==" ")&& s!=">"){ui -> output_text->append((QString::fromStdString(save)) + " tag is incorrect");}
-               else{
                saveO = save;
                saveO.erase(remove(saveO.begin() ,saveO.end(), '<'), saveO.end());
                saveO.erase(remove(saveO.begin() ,saveO.end(), '>'), saveO.end());
                d.push(saveO);
-                }
             }
             else if(sb =="/"){
-
                 while(s!=">"){
                     s = xml[i];
-                    next = xml[i+1];
-//                    if (s ==" "){
-//                        save +=">";
-//                        ui -> output_text->append((QString::fromStdString(save)) + " tag is missing the second tag");
-//                        break;
-//                    }
-//                    else
-                        if ( next == "<"||next ==" "){
-                        save += s;
-                        break;
-
-                    }
-                    else{
-
                     save += s;
                     i++;
-                    }
-
-                    //w hena
-                  //  close_tag_name = close_tag_name + s;
-//                    save += s;
-//                    i++;
                 }
                 closing = true;
-                next = xml[i+1];
-                if ((next =="<"|| next==" ")&& s!=">"){ui -> output_text->append((QString::fromStdString(save)) + " tag is incorrect");}
-
                 saveC = save;
                 saveC.erase(remove(saveC.begin() ,saveC.end(), '<'), saveC.end());
                 saveC.erase(remove(saveC.begin() ,saveC.end(), '/'), saveC.end());
@@ -1602,7 +1527,8 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
                             d.pop();
                             while (!u.empty())
                             {
-                                 ui -> output_text->append((QString::fromStdString(u.top())) + " tag isn't closed ");
+
+                                ui -> output_text->append((QString::fromStdString(u.top())) + " tag isn't closed ");
                                 u.pop();
                             }
                             break;
@@ -1619,13 +1545,12 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
                     u.pop();
                 }
                 if (!c.empty()) {
-                   ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
+                    ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
                     c.pop();
                 }
             }
             else
             {
-                //ui -> output_text->append((QString::fromStdString(d.top())) + " tag is true ");
                 d.pop();
                 c.pop();
             }
@@ -1646,7 +1571,6 @@ void MainWindow::on_actionCheck_for_Errors_triggered()
         ui -> output_text->append((QString::fromStdString(c.top())) + " tag isn't opened ");
         c.pop();
     }
-
 }
 
 void MainWindow::on_Correct_btn_clicked()
@@ -1666,131 +1590,13 @@ void MainWindow::on_actionCorrect_Errors_triggered()
 {
     ui->output_text->clear();
     int i = 0;
-        std::string temp, temp1, temp2, Tag, open_tag_name, closed_tag_name, correct,next,last;
-        std::stack<std::string> open_st, closed_st, temp_st;
-        //QVector<std::string> blabla ;
+        std::vector<std::string> xml;
         QString qstr = ui->input_text->toPlainText();
         std:: string XML=qstr.toStdString();
-        //std::vector<std::string> xml;
-        XML = RemoveSpace(XML);
-
-      //  xml_corrector(XML);
-        //XML.erase(std::remove_if(XML.begin(), XML.end(), ::isspace));
-        //XML.replace(XML.size()-1,2,"");
-       //qDebug()<< QString::fromStdString(XML);
-        while(i < XML.size()){
-            temp1 = XML[i];
-            if(temp1 == "<"){
-                temp2 = XML[i+1];
-                if(temp2 != "/"){
-                    temp1 = XML[i];
-                    while(temp1 != ">"){
-                        temp1 = XML[i];
-                        next = XML[i+1];
-//                        last = Tag.back();
-                        if (temp1 ==" " && (next!="<")){
-
-                            Tag +=">";
-                            break;
-                        }
-                        else if ( next == "<"){
-                            Tag += temp1;
-                            break;
-
-                        }
-                        else{
-
-                        Tag += temp1;
-                        i++;
-                        }
-                    }
-                    open_tag_name = Tag;
-                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'<'), open_tag_name.end());
-                    open_tag_name.erase(remove(open_tag_name.begin(), open_tag_name.end(),'>'), open_tag_name.end());
-                    open_st.push(open_tag_name);
-                    if(!open_st.empty()&& !closed_st.empty()){
-                        if(closed_st.top() == open_st.top()){
-                            correct += Tag;
-                            temp = closed_st.top();
-                            temp.insert(0, "<");
-                            temp.insert(1, "/");
-                            int x = temp.length();
-                            temp.insert(x, ">");
-                            open_st.pop();
-                            closed_st.pop();
-                            correct += temp;
-                            //qDebug() << QString::fromStdString(correct);
-                        }
-                        else{correct += Tag;}
-                    }
-                    else{correct += Tag;}
-                }
-                else if(temp2 == "/"){
-                    while(temp1 != ">"){
-                        temp1 = XML[i];
-                        Tag += temp1;
-                        i++;
-                    }
-                    closed_tag_name = Tag;
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'<'), closed_tag_name.end());
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'>'), closed_tag_name.end());
-                    closed_tag_name.erase(remove(closed_tag_name.begin(), closed_tag_name.end(),'/'), closed_tag_name.end());
-                    closed_st.push(closed_tag_name);
-                    if(!open_st.empty()&& !closed_st.empty()){
-                        if(closed_st.top() != open_st.top()){
-                            while(!closed_st.empty()){
-                                temp_st.push(closed_st.top());
-                                closed_st.pop();
-                            }
-                        }
-                        else if(closed_st.top() == open_st.top()){
-                            while(!open_st.empty()&& !closed_st.empty()){
-                                temp = closed_st.top();
-                                temp.insert(0, "<");
-                                temp.insert(1, "/");
-                                int x = temp.length();
-                                temp.insert(x, ">");
-                                closed_st.pop();
-                                open_st.pop();
-                                correct += temp;
-                            }
-                        }
-                    }
-                }
-            }
-            else{
-                while(temp1 != "<"){
-                    Tag += temp1;
-                    i++;
-                    temp1 = XML[i];
-                }
-                correct += Tag;
-            }
-            Tag = "";
-            open_tag_name = "";
-            closed_tag_name = "";
-            temp = "";
-            while(!temp_st.empty()){
-                closed_st.push(temp_st.top());
-                temp_st.pop();
-            }
-        }
-        //ana eli mzawedaha de
-        while(!open_st.empty()&& closed_st.empty()){
-            temp = open_st.top();
-            temp.insert(0, "<");
-            temp.insert(1, "/");
-            int x = temp.length();
-            temp.insert(x, ">");
-            closed_st.push(temp);
-            closed_st.pop();
-            open_st.pop();
-            correct += temp;
-        }
-        ui->output_text->insertPlainText(QString::fromStdString(correct));
-        QMessageBox::information(this,"","Corrected");
-        //QMessageBox::warning(this,"YAY","Corrected");
-        //cout << correct << endl;
+        //XML = RemoveSpace(XML);
+        xml = split(XML," ");
+        std::string corrected = correct_XML(xml);
+        ui->output_text->insertPlainText(QString::fromStdString(corrected));
 }
 
 void MainWindow::on_Minify_btn_clicked()
@@ -2189,7 +1995,6 @@ void MainWindow::on_actionConver_to_Json_triggered()
 
 void MainWindow::on_Compress_btn_clicked()
 {
-
     QString qstr = ui->input_text->toPlainText();
     if (qstr!= ""){
     std:: string str=qstr.toStdString();
@@ -2197,10 +2002,6 @@ void MainWindow::on_Compress_btn_clicked()
     std::string encodedString;
         calcFreq(str, str.length());
         HuffmanCodes(str.length());
-        //std::cout << "Character With there Frequencies:\n";
-        //for (auto v = codes.begin(); v != codes.end(); v++)
-          //  std::cout << v->first << ' ' << v->second <<"\n";
-
         for (auto i : str)
             encodedString += codes[i];
         XmlParser xmlparser;
@@ -2208,24 +2009,25 @@ void MainWindow::on_Compress_btn_clicked()
         encodedString = encoded.second;
         ui->output_text->setPlainText(QString::fromStdString(encodedString));
     }
-        //std::cout << "\nEncoded Huffman data:\n" << encodedString ;
 }
 void MainWindow::on_actionCompress_triggered()
 {
     QString qstr = ui->input_text->toPlainText();
+    if (qstr!= ""){
     std:: string str=qstr.toStdString();
     str = RemoveSpace(str);
     std::string encodedString;
         calcFreq(str, str.length());
         HuffmanCodes(str.length());
-        //std::cout << "Character With there Frequencies:\n";
-       // for (auto v = codes.begin(); v != codes.end(); v++)
-          //  std::cout << v->first << ' ' << v->second <<"\n";
-
         for (auto i : str)
             encodedString += codes[i];
-        ui->output_text->setPlainText(QString::fromStdString(encodedString));
-        //std::cout << "\nEncoded Huffman data:\n"<< encodedString ;
+        XmlParser xmlparser;
+        XmlParser::myPair<int,string> encoded = xmlparser.BiToHex(encodedString);
+        encodedString = encoded.second;
+
+    ui->output_text->setPlainText(QString::fromStdString(encodedString));
+
+    }
 }
 
 void MainWindow::on_decompress_btn_clicked()
@@ -2240,23 +2042,25 @@ void MainWindow::on_decompress_btn_clicked()
     str = RemoveSpace(str);
     std::string  decodedString;
     decodedString= decode_file(minHeap.top(), str);
-       //std::cout << "\nDecoded Huffman Data:\n"<< decodedString ;
-       ui->output_text->setPlainText(QString::fromStdString(decodedString));
+    ui->output_text->setPlainText(QString::fromStdString(decodedString));
     }
 
 }
 void MainWindow::on_actionDecompress_triggered()
 {
     QString qstr = ui->input_text->toPlainText();
+    if (qstr!= ""){
     std:: string str=qstr.toStdString();
+    XmlParser xmlparser ;
+    xmlparser.extractData();
+    int i = xmlparser.xmlcompressedsize % 5;
+    str= xmlparser.HexToBi(XmlParser::myPair(i,str));
     str = RemoveSpace(str);
     std::string  decodedString;
     decodedString= decode_file(minHeap.top(), str);
-      // std::cout << "\nDecoded Huffman Data:\n"  << decodedString ;
-       ui->output_text->setPlainText(QString::fromStdString(decodedString));
+    ui->output_text->setPlainText(QString::fromStdString(decodedString));
 }
-
-
+}
 
 void MainWindow::on_Prettify_btn_clicked()
 {
@@ -2268,7 +2072,82 @@ void MainWindow::on_Prettify_btn_clicked()
     std:: string xml=qstr.toStdString();
     xml = RemoveSpace(xml);
     ui->output_text->clear();
-   // std::string xml = "<users><user><id>1</id><name>Jumana</name></user></users>";
+    std::string s;
+    int ind =0;
+    std:: string str="";
+    int openflag = 0;
+    int closeflag = 0;
+    std::string save;
+    std::string sb;
+    for (unsigned int i = 0; i < xml.size();) {
+        s = xml[i];
+        sb = xml[i+1];
+        if(s == "<" && sb!="/"){
+            save = "";
+            //If is not a closing tag!!
+            while(s!=">"){
+                s = xml[i];
+                save +=s;
+                i++;
+                }
+            openflag++;
+            closeflag = 0;
+            if (openflag > 1) {
+                ind++;
+                }
+            for (int j = 0; j < ind; j++) {
+                str += "    ";		//print tab
+                }
+            str += save + "\n";	//print output
+        }
+        else if(s == "<" && sb == "/"){
+            save = "";
+            //If it is a closing tag!!
+            while(s!=">"){
+                s = xml[i];
+                save +=s;
+                i++;
+                }
+            closeflag++;
+            openflag = 0;
+            if (closeflag > 1) {
+                ind--;
+            }
+            for (int j = 0; j < ind; j++) {
+                str += "    ";		//print tab
+            }
+            str += save + "\n";	//print output
+
+        }
+        else{
+            save = "";
+            sb=" ";
+            while(sb!="<"){
+                s = xml[i];
+                sb= xml[i+1];
+                save +=s;
+                if (i >= xml.size()){break;}
+                i++;
+                }
+            for (int j = 0; j < ind; j++) {
+                if(i>=xml.size()){break;}
+                str += "    ";		//print tab
+                }
+             str += save + "\n";
+        }
+        }
+    ui->output_text->setPlainText(QString::fromStdString(str));
+}
+void MainWindow::on_actionPrettify_triggered()
+{
+    QString qstr = "";
+    if (ui->output_text->toPlainText() == ""){
+    qstr = ui->input_text->toPlainText();}
+    else{
+    qstr = ui->output_text->toPlainText();}
+    std:: string xml=qstr.toStdString();
+    xml = RemoveSpace(xml);
+    ui->output_text->clear();
     std::string s;
     int ind =0;
     std:: string str="";
@@ -2336,8 +2215,7 @@ void MainWindow::on_Prettify_btn_clicked()
     ui->output_text->setPlainText(QString::fromStdString(str));
 }
 
-
-void MainWindow::on_Graph_btn_clicked()
+void MainWindow::on_Search_btn_clicked()
 {
     ui->output_text->clear();
     QString qstr = ui->input_text->toPlainText();
@@ -2356,85 +2234,36 @@ void MainWindow::on_Graph_btn_clicked()
 }
 
 }
-
-
-void MainWindow::on_actionPrettify_triggered()
+void MainWindow::on_actionPost_Search_triggered()
 {
-    QString qstr = "";
-    if (ui->output_text->toPlainText() == ""){
-    qstr = ui->input_text->toPlainText();}
-    else{
-    qstr = ui->output_text->toPlainText();}
+    ui->output_text->clear();
+    QString qstr = ui->input_text->toPlainText();
     std:: string xml=qstr.toStdString();
     xml = RemoveSpace(xml);
-    ui->output_text->clear();
-   // std::string xml = "<users><user><id>1</id><name>Jumana</name></user></users>";
-    std::string s;
-    int ind =0;
-    std:: string str="";
-    int openflag = 0;
-    int closeflag = 0;
-    std::string save;
-    std::string sb;
-    for (unsigned int i = 0; i < xml.size();) {
-        s = xml[i];
-        sb = xml[i+1];
-        if(s == "<" && sb!="/"){
-            save = "";
-            //If is not a closing tag!!
-            while(s!=">"){
-                s = xml[i];
-                save +=s;
-                i++;
-                }
-            openflag++;
-            closeflag = 0;
-            if (openflag > 1) {
-                ind++;
-                }
-            for (int j = 0; j < ind; j++) {
-                str += "    ";		//print tab
-                }
-            str += save + "\n";	//print output
-        }
-        else if(s == "<" && sb == "/"){
-            save = "";
-            //If it is a closing tag!!
-            while(s!=">"){
-                s = xml[i];
-                save +=s;
-                i++;
-                }
-            closeflag++;
-            openflag = 0;
-            if (closeflag > 1) {
-                ind--;
-            }
-            for (int j = 0; j < ind; j++) {
-                str += "    ";		//print tab
-            }
-            str += save + "\n";	//print output
+    XmlParser xmlparser;
+    xmlparser.xmlCommpressed = xml;
+    xmlparser.extractData();
+    QString userinput = QInputDialog::getText(0 , "Search Post","Please enter Keyword");
+    if(userinput.isEmpty()){
 
-        }
-        else{
-            save = "";
-            sb=" ";
-            while(sb!="<"){
-                s = xml[i];
-                sb= xml[i+1];
-                save +=s;
-                i++;
-                }
-            for (int j = 0; j < ind; j++) {
-                str += "    ";		//print tab
-                }
-             str += save + "\n";
-        }
-        }
-    ui->output_text->setPlainText(QString::fromStdString(str));
+    }
+    else{
+
+    ui->output_text->setPlainText(QString::fromStdString(xmlparser.searchPosts(userinput.toStdString())));
+}
 }
 
-
+void MainWindow::on_Most_followed_clicked()
+{
+    ui->output_text->clear();
+    QString qstr = ui->input_text->toPlainText();
+    std:: string xml=qstr.toStdString();
+    xml = RemoveSpace(xml);
+    XmlParser xmlparser;
+    xmlparser.xmlCommpressed = xml;
+    xmlparser.extractData();
+    ui->output_text->setPlainText(QString::fromStdString(xmlparser.doNetworkAnalysis()));
+}
 void MainWindow::on_actionMost_Followed_triggered()
 {
     ui->output_text->clear();
@@ -2447,8 +2276,17 @@ void MainWindow::on_actionMost_Followed_triggered()
     ui->output_text->setPlainText(QString::fromStdString(xmlparser.doNetworkAnalysis()));
 }
 
-
-
+void MainWindow::on_Most_Active_clicked()
+{
+    ui->output_text->clear();
+    QString qstr = ui->input_text->toPlainText();
+    std:: string xml=qstr.toStdString();
+    xml = RemoveSpace(xml);
+    XmlParser xmlparser;
+    xmlparser.xmlCommpressed = xml;
+    xmlparser.extractData();
+    ui->output_text->setPlainText(QString::fromStdString(xmlparser.MostActive()));
+}
 void MainWindow::on_actionMost_Active_triggered()
 {
     ui->output_text->clear();
@@ -2461,8 +2299,27 @@ void MainWindow::on_actionMost_Active_triggered()
     ui->output_text->setPlainText(QString::fromStdString(xmlparser.MostActive()));
 }
 
+void MainWindow::on_Mutual_friends_clicked()
+{
+    ui->output_text->clear();
+    QString qstr = ui->input_text->toPlainText();
+    std:: string xml=qstr.toStdString();
+    xml = RemoveSpace(xml);
+    XmlParser xmlparser;
+    xmlparser.xmlCommpressed = xml;
+    xmlparser.extractData();
+    QString userinput = QInputDialog::getText(0 , "Enter users ids","Please enter your 2 users ids separated by a comma");
+    if(userinput.isEmpty()){
 
+    }
+    else{
+    QStringList splitted = userinput.split(",");
+    string x = splitted[0].toStdString();
+    string y = splitted[1].toStdString();
+    ui->output_text->setPlainText(QString::fromStdString(xmlparser.getMutualFollowers(x,y)));
+    }
 
+}
 void MainWindow::on_actionMutual_Friends_triggered()
 {
     ui->output_text->clear();
@@ -2484,8 +2341,7 @@ void MainWindow::on_actionMutual_Friends_triggered()
     }
 }
 
-
-void MainWindow::on_actionSuggest_Friends_triggered()
+void MainWindow::on_Recommend_friends_clicked()
 {
     ui->output_text->clear();
     QString qstr = ui->input_text->toPlainText();
@@ -2499,16 +2355,13 @@ void MainWindow::on_actionSuggest_Friends_triggered()
 
     }
     else{
-//    QStringList splitted = userinput.split(",");
-//    string x = splitted[0].toStdString();
-//    string y = splitted[1].toStdString();
     ui->output_text->setPlainText(QString::fromStdString(xmlparser.recommendPeople(userinput.toStdString())));
     }
+
 }
-
-
-void MainWindow::on_actionPost_Search_triggered()
+void MainWindow::on_actionSuggest_Friends_triggered()
 {
+
     ui->output_text->clear();
     QString qstr = ui->input_text->toPlainText();
     std:: string xml=qstr.toStdString();
@@ -2516,16 +2369,11 @@ void MainWindow::on_actionPost_Search_triggered()
     XmlParser xmlparser;
     xmlparser.xmlCommpressed = xml;
     xmlparser.extractData();
-    QString userinput = QInputDialog::getText(0 , "Search Post","Please enter Keyword");
+    QString userinput = QInputDialog::getText(0 , "","Please enter User ID");
     if(userinput.isEmpty()){
 
     }
     else{
-
-    ui->output_text->setPlainText(QString::fromStdString(xmlparser.searchPosts(userinput.toStdString())));
+    ui->output_text->setPlainText(QString::fromStdString(xmlparser.recommendPeople(userinput.toStdString())));
+    }
 }
-}
-
-
-
-

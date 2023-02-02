@@ -2382,7 +2382,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="Exit_Button">
             <property name="text">
              <string>Exit</string>
             </property>
@@ -2891,7 +2891,7 @@
            <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>2</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QPushButton" name="Compress_btn">
@@ -2915,13 +2915,48 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="Graph_btn">
+           <widget class="QPushButton" name="Search_btn">
             <property name="text">
              <string>Post Search</string>
             </property>
            </widget>
           </item>
          </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="Most_followed">
+          <property name="text">
+           <string>Most Followed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Most_Active">
+          <property name="text">
+           <string>Most Active</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Mutual_friends">
+          <property name="text">
+           <string>Mutual Friends</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Recommend_friends">
+          <property name="text">
+           <string>Recommend Friends</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
