@@ -1,54 +1,12 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <QMessageBox>
-#include <QFile>
-#include <QTextStream>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QDir>
-#include <QMenu>
-#include <QAction>
-#include <QStatusBar>
-#include <QKeyEvent>
-#include <QStack>
-#include <stack>
-#include <QString>
-#include <QDebug>
 #include <bits/stdc++.h>
-#include <QTextCursor>
-#include<algorithm>
-#define MAX_TREE_HT 256
 
 #define MAXASCII 256
-#define XML_FORMAT 0
-#define JSON_FORMAT 1
-#define PRIMITIVE 2
-#define ARRAY 3
-#define OBJECT 4
-#define  ILLUSION -1
 
-
-typedef unsigned long long ull;
-#define USER_ID 0
-#define FOLLOWER_ID 1
-#define NAME 2
-#define BODY 3
-#define TOPICS 4
-#define FOLLOWERS 5
-#define POSTS 6
-#define MAXASCII 256
-// for color coding
-#define ID_COLOR 0
-#define USER_COLOR 1
-#define USERS_COLOR 2
-#define FOLLOWER_COLOR 3
-#define FOLLOWERS_COLOR 4
-#define POST_COLOR 5
-#define POSTS_COLOR 6
-#define NAME_COLOR 7
-#define TOPIC_COLOR 8
-#define TOPICS_COLOR 9
-#define BODY_COLOR 10
 namespace Entity
 {
     using namespace std;
@@ -119,8 +77,6 @@ namespace Entity
         static void setField(myPair<int, T>& target, vector< myPair<int, T> >& list);
         bool isStartTag(string tag);
         string getData(string& xml, int& counter);
-        void checkStack();
-        string trimLine(string input);
         string getTagFrame(string& xml, int& pointer);
         void deleteNewLines();
         void extractData();
@@ -150,6 +106,7 @@ namespace Entity
 }
 
 using namespace Entity;
+
 std::vector<std::string> XmlParser::splitter(std::string s, int size) {
     vector<string>chars;
     while (s.size() > 0) {
@@ -157,12 +114,6 @@ std::vector<std::string> XmlParser::splitter(std::string s, int size) {
         s.erase(0, size);
     }
     return chars;
-}
-std::string XmlParser::getSpace(int numOfSpaces) {
-    string spaces;
-    for (int i = 0; i < numOfSpaces; ++i)
-        spaces.push_back(' ');
-    return spaces;
 }
 std::string XmlParser::getTagName(string tag) {
     string name;
@@ -391,10 +342,6 @@ std::string XmlParser::HexToBi(XmlParser::myPair<int,string> encoded){
         i--;
     }
     return bi;
-}
-
-bool XmlParser::compareByLength(const myPair<string, string>& a, const myPair<string, string>& b) {
-    return a.second.size() < b.second.size();
 }
 
 bool XmlParser::isSubString(string target, string base)
@@ -738,44 +685,6 @@ void XmlParser::extractData() {
     }
     sort(users.begin(), users.end(), compareUsers);
 }
-void XmlParser::fillColors() {
-    colors.clear();
-    colors.resize(11);
-    for (int i = 0; i < xmlFormatted.size(); ++i) {
-        if (xmlFormatted[i] == '<' && (i == 0 || xmlFormatted[i - 1] != '\\' || (i >= 2 && xmlFormatted[i - 1] == '\\' && xmlFormatted[i - 2] == '\\'))) { //markd the start of a tag
-            int start = i;
-            string tagFrame = getTagFrame(xmlFormatted, i);
-            int end = i;
-            string tagName = getTagName(tagFrame);
-            int target = -1;
-            if (tagName == "users")
-                target = USERS_COLOR;
-            else if (tagName == "user")
-                target = USER_COLOR;
-            else if (tagName == "id")
-                target = ID_COLOR;
-            else if (tagName == "name")
-                target = NAME_COLOR;
-            else if (tagName == "posts")
-                target = POSTS_COLOR;
-            else if (tagName == "post")
-                target = POST_COLOR;
-            else if (tagName == "body")
-                target = BODY_COLOR;
-            else if (tagName == "topic")
-                target = TOPIC_COLOR;
-            else if (tagName == "topics")
-                target = TOPICS_COLOR;
-            else if (tagName == "follower")
-                target = FOLLOWER_COLOR;
-            else if (tagName == "followers")
-                target = FOLLOWERS_COLOR;
-            else
-                break;
-            colors[target].push_back(createPair(start, end));
-        }
-    }
-}
 
 string XmlParser::getTagFrame(string& xml, int& pointer) {
     string tagFrame;
@@ -796,19 +705,8 @@ string XmlParser::getData(string& xml, int& counter) {
     return data;
 }
 
-string XmlParser::trimLine(string input) {
-    for (int i = 0; i < input.size() && input[i] == ' ';)
-        input.erase(i, 1);
-    for (int i = input.size() - 1; i >= 0 && input[i] == ' '; --i)
-    {
-        input.erase(i, 1);
-    }
-    return input;
-}
-
 template<class T>
-//static ana eli sheltaha
- void XmlParser::setField(myPair<int, T>& target, vector< myPair<int, T> >& list) {
+void XmlParser::setField(myPair<int, T>& target, vector< myPair<int, T> >& list) {
     if (!list.empty()) {
         if (list.size() == 1) {
             target = list[0];
@@ -2309,17 +2207,25 @@ void MainWindow::on_Mutual_friends_clicked()
     xmlparser.xmlCommpressed = xml;
     xmlparser.extractData();
     QString userinput = QInputDialog::getText(0 , "Enter users ids","Please enter your 2 users ids separated by a comma");
+
     if(userinput.isEmpty()){
 
     }
     else{
-    QStringList splitted = userinput.split(",");
-    string x = splitted[0].toStdString();
-    string y = splitted[1].toStdString();
-    ui->output_text->setPlainText(QString::fromStdString(xmlparser.getMutualFollowers(x,y)));
+        QStringList splitted = userinput.split(",");
+        if(splitted.size()==2){
+        string x = splitted[0].toStdString();
+        string y = splitted[1].toStdString();
+        ui->output_text->setPlainText(QString::fromStdString(xmlparser.getMutualFollowers(x,y)));
+        }
+        else {
+         QMessageBox::warning(this,"Warning","INVALID please add a comma");
+        }
+
+        }
+
     }
 
-}
 void MainWindow::on_actionMutual_Friends_triggered()
 {
     ui->output_text->clear();
@@ -2330,16 +2236,24 @@ void MainWindow::on_actionMutual_Friends_triggered()
     xmlparser.xmlCommpressed = xml;
     xmlparser.extractData();
     QString userinput = QInputDialog::getText(0 , "Enter users ids","Please enter your 2 users ids separated by a comma");
+
     if(userinput.isEmpty()){
 
     }
     else{
-    QStringList splitted = userinput.split(",");
-    string x = splitted[0].toStdString();
-    string y = splitted[1].toStdString();
-    ui->output_text->setPlainText(QString::fromStdString(xmlparser.getMutualFollowers(x,y)));
+        QStringList splitted = userinput.split(",");
+        if(splitted.size()==2){
+        string x = splitted[0].toStdString();
+        string y = splitted[1].toStdString();
+        ui->output_text->setPlainText(QString::fromStdString(xmlparser.getMutualFollowers(x,y)));
+        }
+        else {
+         QMessageBox::warning(this,"Warning","INVALID please add a comma");
+        }
+
+        }
+
     }
-}
 
 void MainWindow::on_Recommend_friends_clicked()
 {
